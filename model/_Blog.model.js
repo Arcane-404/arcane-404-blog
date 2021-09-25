@@ -2,16 +2,39 @@ import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const BlogSchema = new Schema({
-	title: { type: String },
-	body: { type: String },
-	votes: {
-		upVotes: { type: Number },
-		downVotes: { type: Number }
+	author: {
+		id: {
+			type: Schema.Types.ObjectId,
+			ref: 'User'
+		},
+		username: {
+			type: String
+		}
 	},
-	comments: [ { type: String } ],
-	createdOn: { type: Date, default: Date.now }
+	title: {
+		type: String
+	},
+	body: {
+		type: String
+	},
+	upvotes: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'User'
+		}
+	],
+	downvotes: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'User'
+		}
+	],
+	createdOn: {
+		type: Date,
+		default: Date.now
+	}
 })
 
-const BlogModel = mongoose.model('Blog', BlogSchema)
+const Blog = mongoose.model('Blog', BlogSchema)
 
-export default BlogModel
+export default Blog
