@@ -1,16 +1,13 @@
 import express from 'express'
-const router = express.Router()
+
 import { BlogControllers } from '../controllers/index.js'
-// API route to get all blogs
-router.get('/blog', BlogControllers.findAll)
 
-// Route to post a new blog
-router.post('/blog', BlogControllers.postOne)
+const blogRouter = express.Router()
 
-// Route to update an existing blog
-router.put('/blog/:id', BlogControllers.updateOne)
+blogRouter
+	.get('/', BlogControllers.findAll)
+	.post('/create', BlogControllers.postOne)
+	.put('/blog/:id', BlogControllers.updateOne)
+	.delete('/blog/:id', BlogControllers.deleteOne)
 
-// Route to delete a blog
-router.delete('/blog/:id', BlogControllers.deleteOne)
-
-export default router
+export default blogRouter

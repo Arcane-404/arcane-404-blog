@@ -1,8 +1,11 @@
 import express from 'express'
-const router = express.Router()
+
 import { VoteControllers } from '../controllers/index.js'
 
-router.get('/vote', VoteControllers.getVotes)
+const voteRouter = express.Router()
+
+voteRouter
+	.get('/', VoteControllers.getVotes)
 
 
-export default router
+export default voteRouter
