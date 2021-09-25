@@ -1,5 +1,5 @@
 // Modularizing
-import BlogModel from '../model/Blog.model.js'
+import BlogModel from '../model/_Blog.model.js'
 
 export const findAll = (req, res) => {
 	BlogModel.find().then((blogs) => {

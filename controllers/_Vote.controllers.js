@@ -1,4 +1,4 @@
-import VoteModel from '../model/Vote.model.js'
+import VoteModel from '../model/_Vote.model.js'
 
 export const getVotes = (req, res) => {
 	VoteModel.find().then((votes) => {
