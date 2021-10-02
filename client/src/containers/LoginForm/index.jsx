@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import axios from 'axios'
 // import Login from './_LoginForm'
 import { Form } from '../../components'
 import { Alert, FormControls } from '../../connections'
 import { useLogin } from '../../hooks'
 import { authAttributes } from '../../json'
+import { api } from '../../services/api'
 const { EMAIL, PASSWORD } = authAttributes
 
 const LoginForm = () => {
@@ -14,16 +14,13 @@ const LoginForm = () => {
 	const [ resent, setResent ] = useState(false)
 
 	const handleResent = async () => {
-		if (!message.email) return
+		if (!message?.email) return
 		try {
-			const resendVerf = await axios.post('/api/user/resendConfirm', {
-				email: message.email
-			})
-			//console.log(resendVerf)
+			// post - '/user/login' - email
+			const response = await api.resendVerification(message.email)
+			console.log('resend', response, resent)
 			setResent(true)
-		} catch (err) {
-			console.log(err.response)
-		}
+		} catch (error) {	console.error('sent', error) }
 	}
 
 	return (
@@ -41,20 +38,18 @@ const LoginForm = () => {
 					<Form.Submit text="Login" isLoading={ props.isSubmitting } />
 
 					{ // display resend button
-						(message && message.notVerified && !resent) &&
-						 (
-							 <p>
-								 Click
-								 <span onClick={ handleResent } role="button">
-									 | here |
-								 </span>
-								 to resend email verification
-							 </p>
-						 )
+						(message?.notVerified && !resent) && (
+							<p>
+								Click here to{' '}
+								<span onClick={ handleResent } role="button">
+									resend email verification
+								</span>
+							</p>
+						)
 					}
 
 					{ // display resent successful
-						(message && message.notVerified && resent) &&
+						(message?.notVerified && resent) &&
 						 <Alert status="success" text="email verification has been resent" />
 					}
 

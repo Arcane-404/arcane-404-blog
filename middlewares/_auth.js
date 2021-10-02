@@ -16,9 +16,12 @@ const authJWT = async (request, response, next) => {
 			return response.status(401).json({ message: 'Please verify your account!' })
 		}
 		// set req.auth
-		request.auth = { ...request.auth,
+		request.auth = {
+			...request.auth,
 			id: verifiedToken.id,
-			username: verifiedToken.user.username }
+			username: verifiedToken.user.username
+		}
+
 		next()
 
 	} catch (error) {

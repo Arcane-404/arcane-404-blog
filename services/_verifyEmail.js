@@ -1,23 +1,36 @@
 import nodemailer from 'nodemailer'
 
-const verifyURL = process.env.VERIFY_URL || 'http://10.0.0.21:3000/confirm'
+// EDIT: find way to have express app localhost
+const verifyURL = process.env.VERIFY_URL
 
-const htmlTEmplate = token => (
-	`<!DOCTYPE html>
-		<html>
-		  <body>
-        <h2>
-				  Thank you for registering with Arcane-404-Blog!
+const htmlTemplate = token => (`
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<style>
+				body { font: 400 1rem sans-serif; }
+			</style>
+		</head>
+		<body>
+			<header>
+				<h2>
+					Thank you for registering with Arcane-404-Blog!
 				</h2>
+			</header>
+			<main>
 				<p>
-				  Please click <a href="${verifyURL}/${token}" > here </a> to confirm your acoount
+					Please click here to
+					<a href="${ verifyURL }/${ token }">
+						confirm your acoount
+					</a>
 				</p>
-				<footer>
-				  <h5> - Arcane-404-Blog </h5>
-				</footer>
-		  </body>
-	</html>`
-)
+			</main>
+			<footer>
+				<h5> - Arcane-404 </h5>
+			</footer>
+		</body>
+	</html>
+`)
 
 const sendVerifyEmail = async (userEmail, token) => {
 	// create email transport
@@ -27,7 +40,7 @@ const sendVerifyEmail = async (userEmail, token) => {
 		requireTLS: true,
 		auth: {
 			user: process.env.DONOT_EMAIL,
-			pass: process.env.DONOT_PASS
+			pass: process.env.DONOT_PASSWORD
 		}
 	})
 
@@ -35,12 +48,12 @@ const sendVerifyEmail = async (userEmail, token) => {
 		from: process.env.DONOT_EMAIL,
 		to: userEmail,
 		subject: 'Arcane-404-Blog: Please confirm your account',
-		html: htmlTEmplate(token)
+		html: htmlTemplate(token)
 	}
 
 	// send email
 	transporter.sendMail(mailOptions, (err, info) => {
-		if (err) return console.log(err)
+		if (err) return console.error(err)
 		return console.log(info.response)
 	})
 }

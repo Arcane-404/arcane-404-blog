@@ -1,33 +1,36 @@
-import NewPost from './_PostForm.jsx'
-import { SelectOption } from './_PostForm.styles.js'
+import React from 'react'
+import { usePost } from '../../hooks'
+import { Form , Option } from '../../components'
+import { Alert, FormControls } from '../../connections'
 
-export default function NewPostForm () {
+const { TextField, TextAreaField, Menu } = FormControls
+
+function PostForm () {
+
+	const { message, postSchemaProps } = usePost()
+
 	return (
-		<NewPost>
-    	<NewPost.FormHeading>Create New Post</NewPost.FormHeading>
-    	<NewPost.FormControler isRequired>
-      	<NewPost.FormLabeling>Topic</NewPost.FormLabeling>
-      	<NewPost.FormSelect placeholder="Select Topic">
-					<NewPost.SelectOption value="option1">Front-end</NewPost.SelectOption>
-					<NewPost.SelectOption value="option2">Back-end</NewPost.SelectOption>
-					<NewPost.SelectOption value="option3">UX/UI</NewPost.SelectOption>
-					<NewPost.SelectOption value="option3">Database</NewPost.SelectOption>
-					<NewPost.SelectOption value="option3">Design</NewPost.SelectOption>
-      	</NewPost.FormSelect>
-    	</NewPost.FormControler>
-    	<NewPost.FormControler isRequired>
-      	<NewPost.FormLabeling>Title</NewPost.FormLabeling>
-      	<NewPost.FormInput type="text" />
-    	</NewPost.FormControler>
-    	<NewPost.FormControler isRequired>
-      	<NewPost.FormLabeling>Description</NewPost.FormLabeling>
-      	<NewPost.FormTextArea />
-    	</NewPost.FormControler>
-    	<NewPost.FormControler>
-      	<NewPost.FormLabeling>Tags</NewPost.FormLabeling>
-      	<NewPost.FormInput type="text" />
-    	</NewPost.FormControler>
-    	<NewPost.FormButton>Submit</NewPost.FormButton>
-  	</NewPost>
+		<Form { ...postSchemaProps }>
+			{(props) => (
+				<Form.Form>
+					<Form.Heading>New Post</Form.Heading>
+					<TextField name="imgUrl" label="Image URL" placeholder="Enter image url link" />
+					<TextField name="title" label="Title" placeholder="Enter title here" />
+					<TextField name="tagline" label="Tagline" placeholder="Enter post tagline" />
+					<Menu name="category" label="Category" placeholder="Select post category">
+						<Option value="Front-End">Front-End</Option>
+						<Option value="Back-End">Back-End</Option>
+						<Option value="React-Only">React-Only</Option>
+						<Option value="CSS">CSS</Option>
+					</Menu>
+					<TextAreaField name="description" label="Description" placeholder="Enter your post description" />
+					<TextField name="tags" label="tags" placeholder="Enter tags here" />
+					{/*<Alert status={ message.status } text={ message.text } />*/}
+					<Form.Submit text="Login" isLoading={ props.isSubmitting } />
+				</Form.Form>
+			)}
+		</Form>
 	)
 }
+
+export default PostForm

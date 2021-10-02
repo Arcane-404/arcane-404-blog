@@ -6,24 +6,20 @@ import { User, Verify } from '../model/index.js'
 
 import sendVerifyEmail from '../services/_verifyEmail.js'
 
-
-const tokenOptions = {
-	expiresIn: '2h'
-}
+const tokenOptions = { expiresIn: '2h' }
 
 // find exiting user from email
 const findExistingEmail = async (email) => {
 	try {
 		// check if user exists
 		const existingUser = await User.findOne({ email: email.toLowerCase() })
-		if (existingUser) {
-			return {
-				status: 409,
-				message: 'User exists. Please create a new user!'
-			}
-		} else {
-			return null
+
+		if (existingUser) return {
+			status: 409,
+			message: 'User exists. Please create a new user!'
 		}
+		else return null
+
 	} catch (err) {
 		return {
 			status: 500,
@@ -37,9 +33,8 @@ const errorMsg = (message = 'error message') => ({ message })
 
 // function for creating user object
 const createUserObj = (user) => {
-	if (!user) {
-		return {}
-	}
+	if (!user) return {}
+
 	return {
 		username: user.username,
 		email: user.email,
@@ -64,18 +59,16 @@ export const register = async (req, res) => {
 
 		// check if user exists or there is an error
 		const checkUser = await findExistingEmail(email)
-		if (checkUser) {
-			return res.status(checkUser.status).json(errorMsg(checkUser.message))
-		}
+		if (checkUser) return res.status(checkUser.status).json(errorMsg(checkUser.message))
 
 		// encrypt user password
-		const hashedPWD = await bcrypt.hash(password, 10)
+		const hashedPassword = await bcrypt.hash(password, 10)
 
 		// save to db
 		const newUser = new User({
 			username,
 			email: email.toLowerCase(),
-			password: hashedPWD
+			password: hashedPassword
 		})
 
 		const confirmToken = new Verify({
@@ -90,14 +83,15 @@ export const register = async (req, res) => {
 		await confirmToken.save()
 		await newUser.save()
 
-		return res.json({ data: 'User registered succesfully! Please check email for confirmation' })
+		return res.status(200).json({
+			message: 'Registered succesfully! Please check your email for confirmation.'
+		})
 
-	} catch (err) {
-		console.log(err.message)
-		return res.status(500).json(errorMsg(err.message))
+	} catch (error) {
+		console.error(error.message)
+		return res.status(500).json(errorMsg(error.message))
 	}
 }
-
 
 // LOGIN function
 export const loginJWT = async (req, res) => {
@@ -113,17 +107,17 @@ export const loginJWT = async (req, res) => {
 		// find user based on email
 		const user = await User.findOne({ email: email.toLowerCase() })
 
-		// if user does not exist or password is not correct
-		if (!(user && (await bcrypt.compare(password, user.password)))) {
-			return res.status(400).json(errorMsg('invalid credential'))
-		}
+		// check user based on password
+		const isPassword = await bcrypt.compare(password, user.password)
 
-		if (!user.isVerified) {
-			return res.json({
-				user: { email: user.email },
-				message: 'please verify email'
-			})
-		}
+		// if user does not exist or password is not correct
+		if (!(user && isPassword)) return res.status(400).json(errorMsg('invalid credential'))
+
+		// valid user, but not verified
+		if (!user.isVerified) return res.json({
+			user: { email: user.email },
+			message: 'please verify email'
+		})
 
 		// user object
 		const userObj = createUserObj(user)
@@ -134,15 +128,17 @@ export const loginJWT = async (req, res) => {
 			user: userObj
 		}
 
+		// auth token
 		const token = jwt.sign(tokenObj, process.env.JWT_SECRET, tokenOptions)
 
 		return res.status(200).json({
-			token, user: userObj
+			token,
+			user: userObj
 		})
 
-	} catch (err) {
-		console.log(err.message)
-		return res.status(500).json(errorMsg(err.message))
+	} catch (error) {
+		console.log(error.message)
+		return res.status(500).json(errorMsg(error.message))
 	}
 }
 
@@ -150,10 +146,10 @@ export const loginJWT = async (req, res) => {
 // CONFIRM USER
 export const confirmUser = async (req, res) => {
 
-	const confirmToken = req.body ? req.body.confirmId : null
-	if (!confirmToken) {
-		return res.status(401).json(errorMsg('No confirm token provided, cannot verify user!'))
-	}
+	const confirmToken = req?.body?.confirmId
+
+	// unverifyed user token
+	if (!confirmToken) return res.status(401).json(errorMsg('No confirm token provided, cannot verify user!'))
 
 	try {
 		// find confirmation token
@@ -170,9 +166,7 @@ export const confirmUser = async (req, res) => {
 		if (!findUser) return res.status(401).json(errorMsg('invalid token'))
 
 		// if user is verified before
-		if (findUser._user.isVerified) {
-			return res.json({ data: 'email confirmed!' })
-		}
+		if (findUser._user.isVerified) return res.json({ data: 'email confirmed!' })
 
 		// find the user by id and update verification status
 		const confirmedUser = await User.findById(findUser._user._id)
@@ -181,45 +175,40 @@ export const confirmUser = async (req, res) => {
 
 		return res.json({ data: 'email confirmed!' })
 
-	} catch (err) {
-		console.log(err.message)
-		return res.status(500).json(errorMsg(err.message))
+	} catch (error) {
+		console.log(error.message)
+		return res.status(500).json(errorMsg(error.message))
 	}
 }
 
 // RESEND CONFIRMATION
 export const resendConfirm = async (req, res) => {
 	const { email } = req.body
+
 	// check for email
-	if (!email) {
-		return res.status(400).json(errorMsg('email is required for resending confirmation'))
-	}
+	if (!email) return res.status(400).json(errorMsg('email is required for resending confirmation'))
 
 	try {
 
 		const findUser = await User.findOne({ email })
 
-		if (!findUser) {
-			return res.status(404).json(errorMsg('user does not exist'))
-		}
+		// check if user does not exist
+		if (!findUser) return res.status(404).json(errorMsg('user does not exist'))
 
 		// check if user is verified
-		if (findUser.isVerified) {
-			return res.json({ data: 'email verified' })
-		}
+		if (findUser.isVerified) return res.json({ data: 'email verified' })
 
 		// find and update new token
 		const tokenUpdate = { token: crypto.randomBytes(16).toString('hex') }
 
 		const confirmToken = await Verify.findOneAndUpdate({
-			 _user: findUser._id
+			_user: findUser._id
 		},
 		tokenUpdate,
 		{
 			new: true,
 			upsert: true
-		}
-		)
+		})
 
 		// send email
 		sendVerifyEmail(findUser.email, confirmToken.token)

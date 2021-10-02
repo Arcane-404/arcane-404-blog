@@ -11,11 +11,13 @@ import { Button } from '..'
 
 export const FormBox = chakra(Form, {
 	baseStyle: {
-		border: '1px',
+		// border: '1px',
 		m: 2,
 		p: 5,
 		rounded: 'md',
-		flex: '1 1 auto'
+		flex: '1 1 auto',
+		borderRadius: '10px',
+		boxShadow: '0 0 2em #ccc'
 	}
 })
 

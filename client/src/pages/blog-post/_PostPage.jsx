@@ -1,12 +1,12 @@
 import React from 'react'
-
+import { Wrapper } from '../../components'
 import { PostForm } from '../../containers'
 
 const PostPage = () => {
 	return (
-		<div>
+		<Wrapper>
 			<PostForm />
-		</div>
+		</Wrapper>
 	)
 }
 

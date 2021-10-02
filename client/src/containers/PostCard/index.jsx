@@ -2,6 +2,7 @@ import { set } from 'mongoose'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 
+import { DownVote, UpVote } from '../../connections'
 import PostCard from './_PostCard'
 
 const PostCardContainer = ({ headline, tagline, topic, timestamp, image, content, setContent }) => {
@@ -30,7 +31,10 @@ const PostCardContainer = ({ headline, tagline, topic, timestamp, image, content
 			<PostCard.Timestamp>{ timestamp }</PostCard.Timestamp>
 			
 			<PostCard.Image src={ image } /> 
+			<UpVote />
+			<DownVote />
 		</PostCard>
+		
 	)
 }
 

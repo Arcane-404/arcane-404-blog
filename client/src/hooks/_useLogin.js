@@ -13,7 +13,7 @@ const initialMessage = {
 	text: undefined
 }
 
-const delayLogin = 1000
+const DELAY_LOGIN = 1000
 
 const useLogin = () => {
 
@@ -46,10 +46,10 @@ const useLogin = () => {
 			const { data } = await api.loginUser(values)
 
 			if (!data.token && data.user && data.message) {
-				console.log('no verify email', data.user.email, data.message)
+				console.log('no verify email', data)
 				setMessage({
-					status: 'warning',
-					text: `${data.message}: click below to resend`,
+					status: data.status || 'warning',
+					text: data.message,
 					notVerified: true,
 					email: data.user.email
 				})
@@ -61,7 +61,7 @@ const useLogin = () => {
 				text: 'login success'
 			})
 
-			delay(delayLogin).then(() => {
+			delay(DELAY_LOGIN).then(() => {
 				actions.setSubmitting(false)
 				setMessage(initialMessage)
 				login(data).then(() => navigate('/'))

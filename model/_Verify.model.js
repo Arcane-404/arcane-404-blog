@@ -17,4 +17,6 @@ const VerifySchema = new Schema({
 	}
 })
 
-export default model('Verify', VerifySchema)
+const Verify = model('Verify', VerifySchema)
+
+export default Verify

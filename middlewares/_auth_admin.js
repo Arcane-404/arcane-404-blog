@@ -20,9 +20,12 @@ const authJWTAdmin = async (request, response, next) => {
 		}
 
 		// set req.auth
-		request.auth = { ...request.auth,
+		request.auth = {
+			...request.auth,
 			id: verifiedToken.id,
-			username: verifiedToken.user.username }
+			username: verifiedToken.user.username
+		}
+
 		next()
 
 	} catch (error) {
