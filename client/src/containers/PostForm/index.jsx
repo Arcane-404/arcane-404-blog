@@ -25,7 +25,7 @@ function PostForm () {
 					</Menu>
 					<TextAreaField name="description" label="Description" placeholder="Enter your post description" />
 					<TextField name="tags" label="tags" placeholder="Enter tags here" />
-					{/*<Alert status={ message.status } text={ message.text } />*/}
+					<Alert status={ message.status } text={ message.text } />
 					<Form.Submit text="Login" isLoading={ props.isSubmitting } />
 				</Form.Form>
 			)}
