@@ -4,21 +4,25 @@ import Blog from '../model/_Blog.model.js'
 export const postOne = async (req, res) => {
 	try {
 		// console.log(req.body, req.auth)
-		const { title, body } = req.body
+		const { title, description, tags, categories, imageUrl } = req.body
 		const { id, username } = req.auth
+
 		const newBlog = await Blog.create({
 			author: {
 				id,
 				username
 			},
 			title,
-			body
+			description,
+			tags,
+			categories,
+			imageUrl
 		})
 		return res.status(200).json({ blog: newBlog })
 
 	} catch (err) {
 		console.log(err.message)
-		return res.status(500).json({ error: err.message })
+		return res.status(500).json({ error: 'Blog Validation Failed' })
 	}
 }
 
@@ -53,11 +57,15 @@ export const searchBlogs = async (req, res) => {
 export const updateBlogById = async (req, res) => {
 	try {
 		const id = req.params.id
+		const { title, description, tags, categories, imageUrl } = req.body
 		const updatedBlog = await Blog.findByIdAndUpdate(
 			{ _id: id },
 			{
-				title: req.body.title,
-				body: req.body.body
+				title,
+				description,
+				tags,
+				categories,
+				imageUrl
 			},
 			{ new: true }
 		)
@@ -153,7 +161,7 @@ export const downvoteBlog = async (req, res) => {
 			}
 		)
 		if (exists.length >= 1) {
-			return res.status(403).json({ message: 'You have already upvoted once' })
+			return res.status(403).json({ message: 'You have already downvoted once' })
 		}
 
 		const checkIfInsideUpvote = checkForUpvote(id)
@@ -178,7 +186,7 @@ export const downvoteBlog = async (req, res) => {
 				},
 				{ new: true }
 			)
-			return res.status(200).json({ updated: update })
+			return res.status(200).json(update)
 		} else {
 			// If it does not exist, add to the array =>
 			const downvotes = await Blog.findByIdAndUpdate(

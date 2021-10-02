@@ -12,10 +12,25 @@ const BlogSchema = new Schema({
 		}
 	},
 	title: {
-		type: String
+		type: String,
+		required: true
 	},
-	body: {
-		type: String
+	description: {
+		type: String,
+		required: true
+	},
+	tags: [
+		{
+			type: String
+		}
+	],
+	categories: {
+		type: String,
+		required: true
+	},
+	imageUrl: {
+		type: String,
+		required: true
 	},
 	upvotes: [
 		{
@@ -39,7 +54,7 @@ const BlogSchema = new Schema({
 			}
 		}
 	],
-	// Add comments: [String?]
+	// Add comments: [String]
 	createdOn: { type: Date, default: Date.now }
 })
 
