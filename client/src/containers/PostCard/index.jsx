@@ -1,14 +1,22 @@
+import { set } from 'mongoose'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 
 import { DownVote, UpVote } from '../../connections'
 import PostCard from './_PostCard'
 
-const PostCardContainer = ({ headline, tagline, topic, timestamp, image }) => {
+const PostCardContainer = ({ headline, tagline, topic, timestamp, image, content, setContent }) => {
 	const history = useHistory()
 	const navigate = (path) => history.push(path)
 
 	const onClick = () => {
+		setContent({
+			headline,
+			tagline,
+			topic,
+			timestamp,
+			image
+		})
 		navigate('/blog/content')
 	}
 

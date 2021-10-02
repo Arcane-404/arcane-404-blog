@@ -1,10 +1,18 @@
 import React from 'react'
 
-const ContentPage = () => {
+import { Main } from '../../components'
+import { ContentCard } from '../../containers'
+
+const ContentPage = ({ content, setContent }) => {
 	return (
-		<div>
-			<h1>Content Page (to read)</h1>
-		</div>
+		<Main>
+			<Main.Wrapper>
+				<ContentCard
+					content={ content }
+					setcontent={ setContent }
+				/>
+			</Main.Wrapper>
+		</Main>
 	)
 }
 

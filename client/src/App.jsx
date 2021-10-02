@@ -1,27 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { PrivateRoute, ProtectedRoute } from './routes'
+
 import { FooterNavigation, HeaderOption } from './containers'
 import {
-	HomePage,
-	ContentPage,
-	PostPage,
-	TopicPage,
-	LoginPage,
-	RegisterPage,
-	ErrorPage,
-	ConfirmPage
+	ConfirmPage, ContentPage, ErrorPage, HomePage, LoginPage, PostPage, RegisterPage, TopicPage 
 } from './pages'
+import { PrivateRoute, ProtectedRoute } from './routes'
 
 const App = () => {
+	const [ content, setContent ] = useState(null)
 
 	return (
 		<>
 			<HeaderOption />
 
 			<Switch>
-				<Route path="/" exact component={ HomePage } /> {/* Home */}
-				<Route path="/blog/content" component={ ContentPage } /> {/* Content */}
+				<Route path="/" exact>
+					<HomePage content={ content } setContent={ setContent } />
+				</Route> {/* Home */}
+				<Route path="/blog/content">
+					<ContentPage content={ content } setContent={ setContent } />
+				</Route> {/* Content */}
 				<Route path="/admin/post" component={ PostPage } /> {/* Post */}
 				<Route path="/user/topic" component={ TopicPage } /> {/* Topic */}
 				<ProtectedRoute path="/confirm/:confirmId" component={ ConfirmPage } /> {/* Confirm */}
