@@ -1,39 +1,29 @@
-import React, { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
-import { api } from '../../services/api'
+import React from 'react'
+import { Button, Frame } from '../../components'
+import { Alert } from '../../connections'
+// import { EmailConsumer } from '../../context'
+import { useVerify } from '../../hooks'
 
 const ConfirmPage = (props) => {
 
-	// hook to redirect route
-	const history = useHistory()
-	const navigate = (path) => history.push(path)
-
-	console.log('params', props.match.params)
-	const confirmId = props?.match?.params?.confirmId
-
-	useEffect(() => {
-		(async () => {
-			try {
-				// check if confirmId is not included
-				if (!confirmId) return navigate('/login')
-
-				// post - '/user/confirm' - confirmId
-				await api.makeConfirmation(confirmId)
-				//history.push('/login')
-			} catch (error) {
-				console.error(error)
-				navigate('/login')
-			}
-		})()
-	}, [ navigate, confirmId ])
+	// const confirmId = props?.match?.params?.confirmId
+	// const { resent, resendLink } = EmailConsumer()
+	const { message, resent, resendLink } = useVerify()
 
 	return (
-		<div>
-			<p>
-				Click here to{' '}
-				<a href="/login">login and confirm</a>
-			</p>
-		</div>
+		<Frame.Main>
+			<Frame.Wrapper>
+				<h3>Checking verification. One moment please.</h3>
+
+				{ message.status && (
+					<>
+						<Alert status={ message.status } text={ message.text } />
+						<Button text={ resent.text } onClick={ resendLink } />
+					</>
+				)}
+
+			</Frame.Wrapper>
+		</Frame.Main>
 	)
 }
 

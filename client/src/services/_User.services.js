@@ -23,7 +23,7 @@ export const loginUser = async (body) => {
 
 	try {
 		const { data } = await axios.post(PATH, body)
-		data.status = data.token ? 'success' : 'warning'
+		data.status = data?.token ? 'success' : 'warning'
 		return { data }
 	} catch (error) {
 		// console.warn('error services', error.response)
@@ -39,8 +39,9 @@ export const makeConfirmation = async (confirmId) => {
 	const body = { confirmId }
 
 	try {
-		await axios.post(PATH, body)
-		return true
+		const { data } = await axios.post(PATH, body)
+		data.status = 'success'
+		return { data }
 	} catch (error) {
 		console.log('test', error)
 		// console.warn('error services', error.response)
@@ -56,8 +57,9 @@ export const resendVerification = async (email) => {
 	const body = { email }
 
 	try {
-		await axios.post(PATH, body)
-		return true
+		const { data } = await axios.post(PATH, body)
+		data.status = true
+		return { data }
 	} catch (error) {
 		console.log('test', error)
 		// console.warn('error services', error.response)

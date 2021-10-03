@@ -1,9 +1,7 @@
 import { useState } from 'react'
-// import { useHistory } from 'react-router-dom'
 import * as yup from 'yup'
-// import { AuthConsumer } from '../context'
+import { EmailConsumer } from '../context'
 import { authAttributes } from '../json'
-// import { delay } from '../utils/_helpers'
 import { api } from '../services/api'
 
 const {
@@ -19,15 +17,10 @@ const initialMessage = {
 	text: undefined
 }
 
-// const DELAY_REGISTER = 2000
-
 const useRegister = () => {
 
-	// hook to redirect route
-	// const history = useHistory()
-	// const navigate = (path) => history.push(path)
+	const { setEmail } = EmailConsumer()
 
-	// include alert message for error or success
 	const [ message, setMessage ] = useState(initialMessage)
 
 	// Formik prop: initial state values
@@ -59,6 +52,7 @@ const useRegister = () => {
 			actions.setSubmitting(false)
 			actions.resetForm()
 
+			setEmail(data.email)
 			setMessage({
 				status: data.status,
 				text: data.message

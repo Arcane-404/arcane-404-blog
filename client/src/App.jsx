@@ -1,11 +1,18 @@
 import React, { useState } from 'react'
 import { Route, Switch } from 'react-router-dom'
-
-import { FooterNavigation, HeaderOption } from './containers'
-import {
-	ConfirmPage, ContentPage, ErrorPage, HomePage, LoginPage, PostPage, RegisterPage, TopicPage 
-} from './pages'
 import { PrivateRoute, ProtectedRoute } from './routes'
+import { FooterNavigation, HeaderOption } from './containers'
+import { EmailProvider } from './context/provider'
+import {
+	HomePage,
+	ContentPage,
+	TopicPage,
+	PostPage,
+	LoginPage,
+	RegisterPage,
+	ConfirmPage,
+	ErrorPage
+} from './pages'
 
 const App = () => {
 	const [ content, setContent ] = useState(null)
@@ -23,9 +30,11 @@ const App = () => {
 				</Route> {/* Content */}
 				<Route path="/admin/post" component={ PostPage } /> {/* Post */}
 				<Route path="/user/topic" component={ TopicPage } /> {/* Topic */}
-				<ProtectedRoute path="/confirm/:confirmId" component={ ConfirmPage } /> {/* Confirm */}
-				<ProtectedRoute path="/login" element={ LoginPage } /> {/* Login */}
-				<ProtectedRoute path="/register" component={ RegisterPage } /> {/* Register */}
+				<EmailProvider>
+					<ProtectedRoute path="/confirm/:confirmId" component={ ConfirmPage } /> {/* Confirm */}
+					<ProtectedRoute path="/login" element={ LoginPage } /> {/* Login */}
+					<ProtectedRoute path="/register" component={ RegisterPage } /> {/* Register */}
+				</EmailProvider>
 				<Route path="*" component={ ErrorPage } /> {/* Error Page */}
 			</Switch>
 

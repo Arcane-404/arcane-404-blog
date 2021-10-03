@@ -1,5 +1,4 @@
 import React from 'react'
-// import Register from './_RegisterForm'
 import { Form } from '../../components'
 import { Alert, FormControls } from '../../connections'
 import { useRegister } from '../../hooks'

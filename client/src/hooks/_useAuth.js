@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react'
 import { useStorage } from './'
 import { api } from '../services/api'
 
-const INITIAL_KEY = 'token'
+const KEY_TOKEN = 'token'
 const AUTH_TOKEN = process.env.REACT_APP_AUTH_TOKEN || null
 
 const useAuth = () => {
 
-	const [ token, setToken, removeToken ] = useStorage( INITIAL_KEY, AUTH_TOKEN )
+	const [ token, setToken, removeToken ] = useStorage( KEY_TOKEN, AUTH_TOKEN )
 	const [ isAuth, setAuth ] = useState( false )
 	const [ user, setUser ] = useState( null )
 
@@ -18,11 +18,14 @@ const useAuth = () => {
 			try {
 				// post - '/user/validateToken' - token
 				const data = await api.validateToken(token)
-				setUser(data)
+				setUser(data) // { user }
 				setAuth(true)
-			} catch (error) {	console.error(error) }
+			} catch (error) {
+				console.error('token', error)
+				removeToken()
+			}
 		})()
-	}, [ token ])
+	}, [ token, removeToken ])
 
 	// once logged in: auth == true, token is stored, include user info
 	const login = (data) => new Promise((resolve, reject) => {
