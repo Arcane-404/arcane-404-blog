@@ -8,6 +8,7 @@ import sendVerifyEmail from '../services/_verifyEmail.js'
 
 const tokenOptions = { expiresIn: '2h' }
 
+
 // find exiting user from email
 const findExistingEmail = async (email) => {
 	try {
@@ -32,7 +33,7 @@ const findExistingEmail = async (email) => {
 const errorMsg = (message = 'error message') => ({ message })
 
 // function for creating user object
-const createUserObj = (user) => {
+const createUser = (user) => {
 	if (!user) return {}
 
 	return {
@@ -45,7 +46,7 @@ const createUserObj = (user) => {
 }
 
 
-// REGISTER function
+// REGISTER USER
 export const register = async (req, res) => {
 
 	try {
@@ -66,7 +67,7 @@ export const register = async (req, res) => {
 
 		// save to db
 		const newUser = new User({
-			username,
+			username: !username || 'anonymous',
 			email: email.toLowerCase(),
 			password: hashedPassword
 		})
@@ -84,6 +85,7 @@ export const register = async (req, res) => {
 		await newUser.save()
 
 		return res.status(200).json({
+			email,
 			message: 'Registered succesfully! Please check your email for confirmation.'
 		})
 
@@ -92,6 +94,7 @@ export const register = async (req, res) => {
 		return res.status(500).json(errorMsg(error.message))
 	}
 }
+
 
 // LOGIN function
 export const loginJWT = async (req, res) => {
@@ -114,13 +117,12 @@ export const loginJWT = async (req, res) => {
 		if (!(user && isPassword)) return res.status(400).json(errorMsg('invalid credential'))
 
 		// valid user, but not verified
-		if (!user.isVerified) return res.json({
-			user: { email: user.email },
+		if (!user.isVerified) return res.status(200).json({
 			message: 'please verify email'
 		})
 
 		// user object
-		const userObj = createUserObj(user)
+		const userObj = createUser(user)
 
 		// create token
 		const tokenObj = {
@@ -165,21 +167,26 @@ export const confirmUser = async (req, res) => {
 		// if cannot find user
 		if (!findUser) return res.status(401).json(errorMsg('invalid token'))
 
-		// if user is verified before
-		if (findUser._user.isVerified) return res.json({ data: 'email confirmed!' })
+		// if user is already verified
+		if (findUser._user.isVerified) return res.status(200).json({
+			message: 'Already confirmed. Redirecting to login page...'
+		})
 
 		// find the user by id and update verification status
 		const confirmedUser = await User.findById(findUser._user._id)
 		confirmedUser.isVerified = true
 		await confirmedUser.save()
 
-		return res.json({ data: 'email confirmed!' })
+		return res.status(200).json({
+			message: 'Account has been confirmed. Redirecting to login page...'
+		})
 
 	} catch (error) {
 		console.log(error.message)
 		return res.status(500).json(errorMsg(error.message))
 	}
 }
+
 
 // RESEND CONFIRMATION
 export const resendConfirm = async (req, res) => {
@@ -196,7 +203,9 @@ export const resendConfirm = async (req, res) => {
 		if (!findUser) return res.status(404).json(errorMsg('user does not exist'))
 
 		// check if user is verified
-		if (findUser.isVerified) return res.json({ data: 'email verified' })
+		if (findUser.isVerified) return res.status(200).json({
+			message: 'Email is already verified.'
+		})
 
 		// find and update new token
 		const tokenUpdate = { token: crypto.randomBytes(16).toString('hex') }
@@ -213,7 +222,9 @@ export const resendConfirm = async (req, res) => {
 		// send email
 		sendVerifyEmail(findUser.email, confirmToken.token)
 
-		return res.json({ data: 'email confirmation is sent!' })
+		return res.status(200).json({
+			message: 'Email confirmation has been sent.'
+		})
 
 	} catch (err) {
 		return res.status(500).json(errorMsg(err.message))
@@ -222,7 +233,7 @@ export const resendConfirm = async (req, res) => {
 }
 
 
-// VALIDATE_TOKEN function
+// VALIDATE TOKEN
 export const validateToken = async (req, res) => {
 
 	// get token from header
@@ -237,7 +248,7 @@ export const validateToken = async (req, res) => {
 		const verifiedUser = await User.findById(verified.id)
 		if (!verifiedUser) return res.status(401).json(errorMsg('cannot find user'))
 
-		return res.json(createUserObj(verifiedUser))
+		return res.status(200).json(createUser(verifiedUser))
 
 	} catch (err) {
 		res.status(500).json(errorMsg(err.message))

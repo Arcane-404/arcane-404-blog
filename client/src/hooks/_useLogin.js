@@ -17,12 +17,12 @@ const DELAY_LOGIN = 1000
 
 const useLogin = () => {
 
+	// allow user to authenticate
+	const { login } = AuthConsumer()
+
 	// hook to redirect route
 	const history = useHistory()
 	const navigate = (path) => history.push(path)
-
-	// allow user to authenticate
-	const { login } = AuthConsumer()
 
 	// include alert message for error or success
 	const [ message, setMessage ] = useState(initialMessage)
@@ -45,19 +45,17 @@ const useLogin = () => {
 			// post - '/user/login' - values
 			const { data } = await api.loginUser(values)
 
-			if (!data.token && data.user && data.message) {
+			if (!data.token) {
 				console.log('no verify email', data)
 				setMessage({
-					status: data.status || 'warning',
-					text: data.message,
-					notVerified: true,
-					email: data.user.email
+					status: data.status, // warning
+					text: data.message
 				})
 				return
 			}
 
 			setMessage({
-				status: data.status || 'success',
+				status: data.status, // success
 				text: 'login success'
 			})
 
